@@ -1,6 +1,8 @@
 # generic-token-oauth
 Provides token oauth authorization without redirecting for any third-party service
 
+## Lib is not published in npm yet!!!
+
 ### Note
 This package is intended to use with node.js
 
