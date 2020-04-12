@@ -1,6 +1,6 @@
 {
   "name": "generic-token-oauth",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Provides token oauth authorization without redirecting for any third-party service",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -31,7 +31,6 @@
   ],
   "devDependencies": {
     "@types/chai": "^4.2.10",
-    "@types/dotenv": "^8.2.0",
     "@types/mocha": "^7.0.2",
     "@types/oauth": "^0.9.1",
     "@types/sinon": "^7.5.2",

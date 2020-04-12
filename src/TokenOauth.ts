@@ -1,6 +1,6 @@
 import { OAuth2 } from 'oauth';
 
-import { AuthenticationError, GoogleAuthError, GoogleAuthErrorData } from './types/errors';
+import { AuthenticationError, GoogleAuthError, GoogleAuthErrorData } from './types/errorTypes';
 import {
   TokenOauthOptions,
   AuthType,
@@ -8,7 +8,10 @@ import {
   AuthenticationResult,
   AccessTokenGetResult,
   UserProfileGetResult,
+  OauthOptionsValidationResult,
 } from './types/common';
+import { InvalidOptionsError } from './errors';
+import cfg from './config';
 
 class TokenOauth {
   public name = 'TokenOauth';
@@ -20,18 +23,35 @@ class TokenOauth {
   protected _profileUrl: string;
   protected _oauth2: OAuth2;
   constructor({ authType, clientId, clientSecret, authUrl, tokenUrl, profileUrl }: TokenOauthOptions) {
-    // TODO -> validate params
+    const { err } = this._validateOptions({ authType, clientId, clientSecret, authUrl, tokenUrl, profileUrl });
+    if (err) {
+      throw err;
+    }
+
     this._authType = authType;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
-    this._authUrl = authUrl;
-    this._tokenUrl = tokenUrl;
-    this._profileUrl = profileUrl;
+    this._authUrl = authUrl || cfg.oauth.defaultOptions.authUrl;
+    this._tokenUrl = tokenUrl || cfg.oauth.defaultOptions.tokenUrl;
+    this._profileUrl = profileUrl || cfg.oauth.defaultOptions.profileUrl;
 
     this._oauth2 = new OAuth2(clientId, clientSecret, '', authUrl, tokenUrl);
 
     this._oauth2.useAuthorizationHeaderforGET(true);
   }
+  protected _validateOptions = ({
+    authType,
+    clientId,
+    clientSecret,
+  }: TokenOauthOptions): OauthOptionsValidationResult => {
+    if (!authType || !clientId || !clientSecret) {
+      return {
+        err: new InvalidOptionsError('Invalid Options: Please provide authType, clientId and clientSecret'),
+      };
+    }
+    return {};
+  };
+  protected _throwError = () => {};
   public authenticate = async (authCode: string): Promise<AuthenticationResult> => {
     try {
       const { err: accessTokenErr, accessToken }: AccessTokenGetResult = await this._getAccessToken(authCode);

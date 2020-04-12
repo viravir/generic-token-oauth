@@ -1,4 +1,5 @@
-import { AuthenticationError } from './errors';
+import { AuthenticationError } from './errorTypes';
+import { InvalidOptionsError } from '../errors';
 
 export type AuthType = 'code' | 'accessToken';
 
@@ -6,9 +7,13 @@ export type TokenOauthOptions = {
   authType: AuthType;
   clientId: string;
   clientSecret: string;
-  authUrl: string;
-  tokenUrl: string;
-  profileUrl: string;
+  authUrl?: string;
+  tokenUrl?: string;
+  profileUrl?: string;
+};
+
+export type OauthOptionsValidationResult = {
+  err?: InvalidOptionsError;
 };
 
 export type UserProfile = {
