@@ -16,8 +16,15 @@ export type OauthOptionsValidationResult = {
   err?: InvalidOptionsError;
 };
 
+export type UserProfileData = {
+  [x: string]: string;
+};
+
+// TODO -> make consistent fields (after test with other services)
 export type UserProfile = {
-  [x: string]: string | object;
+  id: string;
+  name?: string;
+  email?: string;
 };
 
 export type AuthenticationResult = {

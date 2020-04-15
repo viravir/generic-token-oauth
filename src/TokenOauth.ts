@@ -4,6 +4,7 @@ import { AuthenticationError, GoogleAuthError, GoogleAuthErrorData } from './typ
 import {
   TokenOauthOptions,
   AuthType,
+  UserProfileData,
   UserProfile,
   AuthenticationResult,
   AccessTokenGetResult,
@@ -51,7 +52,6 @@ class TokenOauth {
     }
     return {};
   };
-  protected _throwError = () => {};
   public authenticate = async (authCode: string): Promise<AuthenticationResult> => {
     try {
       const { err: accessTokenErr, accessToken }: AccessTokenGetResult = await this._getAccessToken(authCode);
@@ -97,21 +97,27 @@ class TokenOauth {
           return resolve({
             err: parsedErr,
             userProfile: {
+              id: '',
               name: '',
               email: '',
             },
           });
         }
 
-        // TODO -> format profile data to always have consistent fields
-        // (like an id)
-        const userProfile: UserProfile = JSON.parse(String(result));
+        const userProfileData: UserProfileData = JSON.parse(String(result));
+
+        const userProfile: UserProfile = this._formatProfileData(userProfileData);
 
         resolve({
           userProfile,
         });
       });
     });
+  protected _formatProfileData = (profileData: UserProfileData): UserProfile => {
+    // Google sends id in 'sub' field
+    const { id, sub, name, email } = profileData;
+    return { id: id || sub, name, email };
+  };
   protected _parseError = (err: GoogleAuthError): AuthenticationError => {
     const { data } = err;
     // TODO -> parse status code to determine own auth type
