@@ -13,6 +13,7 @@ import {
 } from './types/common';
 import { InvalidOptionsError } from './errors';
 import cfg from './config';
+import { parseJSONObject } from './utils';
 
 class TokenOauth {
   public name = 'TokenOauth';
@@ -96,48 +97,76 @@ class TokenOauth {
 
           return resolve({
             err: parsedErr,
-            userProfile: {
-              id: '',
-              name: '',
-              email: '',
-            },
           });
         }
 
-        const userProfileData: UserProfileData = JSON.parse(String(result));
+        if (result && typeof result === 'string') {
+          const userProfileData = parseJSONObject(result);
 
-        const userProfile: UserProfile = this._formatProfileData(userProfileData);
+          if (userProfileData) {
+            const userProfile: UserProfile = this._formatProfileData(userProfileData as UserProfileData);
+
+            return resolve({
+              userProfile,
+            });
+          }
+        }
 
         resolve({
-          userProfile,
+          err: {
+            type: 'parseError',
+            message: 'Profile response was not a valid json object string',
+          },
         });
       });
     });
   protected _formatProfileData = (profileData: UserProfileData): UserProfile => {
-    // Google sends id in 'sub' field
-    const { id, sub, name, email } = profileData;
-    return { id: id || sub, name, email };
+    const {
+      profile: { acceptedFields },
+    } = cfg;
+    // construct user profile with accepted fields
+    const userProfile: UserProfile = acceptedFields.reduce(
+      (profile, { field, possibleExternalFields }) => {
+        const rawData = profile._rawProfileData;
+
+        const externalFieldName = possibleExternalFields.find(possibleField => rawData[possibleField]);
+
+        if (externalFieldName) {
+          return Object.assign({}, profile, { [field]: rawData[externalFieldName] });
+        }
+
+        return profile;
+      },
+      {
+        id: '',
+        _rawProfileData: profileData,
+      } as UserProfile,
+    );
+
+    return userProfile;
   };
+  // TODO -> process more error types
   protected _parseError = (err: GoogleAuthError): AuthenticationError => {
     const { data } = err;
-    // TODO -> parse status code to determine own auth type
-    const parsedError = {
-      type: 'authError',
-      message: '',
-    };
 
     if (data) {
-      try {
-        const { error = '', error_description: errorDescription = '' }: GoogleAuthErrorData = JSON.parse(data);
+      const parsedErrorData = parseJSONObject(data);
 
-        parsedError.message = error && errorDescription ? `${error} (${errorDescription})` : error || errorDescription;
-      } catch {
-        // data prop is not a valid json string
-        parsedError.message = String(data);
+      if (parsedErrorData) {
+        // TODO -> parse status code to determine own auth type
+        const { error = '', error_description: errorDescription = '' } = parsedErrorData as GoogleAuthErrorData;
+
+        return {
+          type: 'authError',
+          message: error && errorDescription ? `${error} (${errorDescription})` : error || errorDescription,
+        };
       }
     }
 
-    return parsedError;
+    return {
+      type: 'authError',
+      message: String(data),
+    };
   };
 }
 

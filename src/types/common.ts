@@ -17,14 +17,15 @@ export type OauthOptionsValidationResult = {
 };
 
 export type UserProfileData = {
-  [x: string]: string;
+  [x: string]: string | number | {} | [];
 };
 
-// TODO -> make consistent fields (after test with other services)
+// TODO -> add consistent fields (after testing with other services)
 export type UserProfile = {
   id: string;
   name?: string;
   email?: string;
+  _rawProfileData: UserProfileData;
 };
 
 export type AuthenticationResult = {
@@ -39,5 +40,12 @@ export type AccessTokenGetResult = {
 
 export type UserProfileGetResult = {
   err?: AuthenticationError;
-  userProfile: UserProfile;
+  userProfile?: UserProfile;
+};
+
+export type JsonObject = {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  [x: string]: any;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  [x: number]: any;
 };

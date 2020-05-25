@@ -9,6 +9,13 @@ const config = {
       invalidOptions: 'Invalid Options: Please provide authType, clientId and clientSecret',
     },
   },
+  profile: {
+    acceptedFields: [
+      { field: 'id', possibleExternalFields: ['id', 'sub'] },
+      { field: 'name', possibleExternalFields: ['name'] },
+      { field: 'email', possibleExternalFields: ['email'] },
+    ],
+  },
 };
 
 export default config;

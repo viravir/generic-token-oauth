@@ -1,6 +1,6 @@
 {
   "name": "generic-token-oauth",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Provides token oauth authorization without redirecting for any third-party service",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

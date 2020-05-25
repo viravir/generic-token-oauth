@@ -11,6 +11,8 @@ const mockTokenOauthConfig: TokenOauthOptions = {
   authType: 'accessToken',
 };
 
+// TODO -> add stubs to test class methods without http calls
+
 describe('Initialization', () => {
   it('Should export TokenOauth constructor', () => {
     expect(TokenOauth).not.to.be.undefined;
