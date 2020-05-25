@@ -34,10 +34,10 @@ const { err, userProfile } = tokenOauth.authorize(oauthCode);
 
 ### TODO
 - [x] Basic implementation (google services)
-- [ ] Format profile data to provide consistent return type
+- [x] Format profile data to provide consistent return type
 - [ ] Write own error types
 - [ ] Add tests
-- [ ] Modify lib (if needed) to use it with different services (test with Facebook and Twitter)
+- [ ] Modify lib to use it with different services (test with Facebook and Twitter)
 - [ ] Refactor code
 
 ### Warning
